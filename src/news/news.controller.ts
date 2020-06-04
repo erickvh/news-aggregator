@@ -5,7 +5,10 @@ import { NewsService } from './news.service';
 export class NewsController {
   constructor(private readonly newsService: NewsService) {}
   @Get()
-  searchArticles(@Query('q') textContent: string) {
-    return this.newsService.getGuardianArticles(textContent);
+  searchArticles(
+    @Query('q') textContent: string,
+    @Query('source') source: string,
+  ) {
+    return this.newsService.getArticles(textContent, source);
   }
 }
