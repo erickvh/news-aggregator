@@ -1,7 +1,7 @@
 import { Injectable, HttpService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { New } from '../interfaces/New.interface';
 import { map } from 'rxjs/operators';
+import { parseGuardian } from 'src/parsers/guardianParse';
 
 @Injectable()
 export class NewsService {
@@ -17,6 +17,6 @@ export class NewsService {
       .get(
         `https://content.guardianapis.com/search?api-key=${apiKey}&q=${searchContent}&${filterNewest}`,
       )
-      .pipe();
+      .pipe(map(response => response.data.response.results.map(parseGuardian)));
   }
 }
