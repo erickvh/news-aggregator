@@ -1,8 +1,10 @@
-import { Injectable, HttpService } from '@nestjs/common';
+import { Injectable, HttpService, HttpException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { map } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
 import { parseGuardian } from 'src/parsers/guardianParse';
 import { NYTParse } from 'src/parsers/NYTParse';
+import { throwError } from 'rxjs';
+import { AxiosError } from 'axios';
 
 @Injectable()
 export class NewsService {
@@ -18,7 +20,16 @@ export class NewsService {
       .get(
         `https://content.guardianapis.com/search?api-key=${apiKey}&q=${searchContent}&${filterNewest}`,
       )
-      .pipe(map(response => response.data.response.results.map(parseGuardian)));
+      .pipe(
+        map(
+          response => response.data.response.results.map(parseGuardian),
+          catchError((error: AxiosError) => {
+            return throwError(
+              new HttpException(error.message, error.response.status),
+            );
+          }),
+        ),
+      );
   }
 
   getNYTimesArticles(searchContent: string) {
@@ -29,7 +40,14 @@ export class NewsService {
       .get(
         `https://api.nytimes.com/svc/search/v2/articlesearch.json?api-key=${apiKey}&q=${searchContent}&filter&${filterNewest}`,
       )
-      .pipe(map(response => response.data.response.docs.map(NYTParse)));
+      .pipe(
+        map(response => response.data.response.docs.map(NYTParse)),
+        catchError((error: AxiosError) => {
+          return throwError(
+            new HttpException(error.message, error.response.status),
+          );
+        }),
+      );
   }
 
   getArticles(searchContent: string, source: string) {
