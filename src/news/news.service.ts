@@ -1,10 +1,16 @@
-import { Injectable, HttpService, HttpException } from '@nestjs/common';
+import {
+  Injectable,
+  HttpService,
+  HttpException,
+  BadRequestException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, reduce } from 'rxjs/operators';
 import { parseGuardian } from 'src/parsers/guardianParse';
 import { NYTParse } from 'src/parsers/NYTParse';
-import { throwError } from 'rxjs';
+import { throwError, merge, Observable } from 'rxjs';
 import { AxiosError } from 'axios';
+import { NewParsed } from 'src/interfaces/NewParsed';
 
 @Injectable()
 export class NewsService {
@@ -13,7 +19,7 @@ export class NewsService {
     private readonly configService: ConfigService,
   ) {}
 
-  getGuardianArticles(searchContent: string) {
+  getGuardianArticles(searchContent: string): Observable<NewParsed[]> {
     const apiKey = this.configService.get('API_KEY_GUARDIAN');
     const filterNewest = 'order-by=newest&show-fields=byline';
     return this.httpService
@@ -32,7 +38,7 @@ export class NewsService {
       );
   }
 
-  getNYTimesArticles(searchContent: string) {
+  getNYTimesArticles(searchContent: string): Observable<NewParsed[]> {
     const apiKey = this.configService.get('API_KEY_NYT');
     const filterNewest = 'sort=newest';
 
@@ -49,15 +55,34 @@ export class NewsService {
         }),
       );
   }
+  getAggregatedNews(searchContent: string): Observable<NewParsed[]> {
+    const guardianObservable = this.getGuardianArticles(searchContent);
+    const nytObservable = this.getNYTimesArticles(searchContent);
 
-  getArticles(searchContent: string, source: string) {
-    switch (source) {
-      case 'nyt':
-        return this.getNYTimesArticles(searchContent);
-        break;
-      case 'guardian':
-        return this.getGuardianArticles(searchContent);
-        break;
+    return merge(guardianObservable, nytObservable).pipe(
+      reduce((newsAggregated, newsStream) => [
+        ...newsAggregated,
+        ...newsStream,
+      ]),
+      map(news =>
+        news.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime()),
+      ),
+    );
+  }
+  getArticles(searchContent: string, source: string): Observable<NewParsed[]> {
+    if (source) {
+      switch (source) {
+        case 'nyt':
+          return this.getNYTimesArticles(searchContent);
+          break;
+        case 'guardian':
+          return this.getGuardianArticles(searchContent);
+          break;
+        default:
+          throw new BadRequestException('Provider not available');
+      }
     }
+
+    return this.getAggregatedNews(searchContent);
   }
 }
