@@ -65,7 +65,7 @@ export class NewsService {
         ...newsStream,
       ]),
       map(news =>
-        news.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime()),
+        news.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime()),
       ),
     );
   }
