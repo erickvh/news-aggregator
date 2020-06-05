@@ -1,6 +1,7 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { NewsModule } from './news/news.module';
+import { EmptySearchMiddleware } from './middleware/empty-search.middleware';
 
 @Module({
   imports: [
@@ -10,4 +11,8 @@ import { NewsModule } from './news/news.module';
     NewsModule,
   ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(EmptySearchMiddleware).forRoutes('news');
+  }
+}

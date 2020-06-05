@@ -12,6 +12,6 @@ export function parseGuardian(article: GuardianNew): NewParsed {
     title: article.webTitle,
     author,
     url: article.webUrl,
-    pubDate: new Date(article.webPublicationDate),
+    publishedAt: new Date(article.webPublicationDate),
   };
 }
