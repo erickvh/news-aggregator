@@ -24,8 +24,8 @@ export class AuthController {
       throw new UnprocessableEntityException();
     }
   }
-
+  @Post('login')
   login(@Body() loginDTO: LoginDTO) {
-    return 'response';
+    return this.authService.getToken(loginDTO);
   }
 }
