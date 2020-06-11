@@ -3,11 +3,13 @@ import {
   Post,
   Body,
   UnprocessableEntityException,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthDTO } from './dto/auth.dto';
 import { UsersService } from 'src/users/users.service';
 import { LoginDTO } from './dto/login.dto';
 import { AuthService } from './auth.service';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('')
 export class AuthController {
@@ -25,6 +27,7 @@ export class AuthController {
     }
   }
   @Post('login')
+  @UseGuards(AuthGuard('local'))
   login(@Body() loginDTO: LoginDTO) {
     return this.authService.getToken(loginDTO);
   }
