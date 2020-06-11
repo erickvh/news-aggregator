@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/users.entity';
+import { Article } from './users/articles.entity';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { User } from './users/users.entity';
       database: process.env.NAME_DB,
       synchronize: true,
       host: process.env.HOST_DB,
-      entities: [User],
+      entities: [User, Article],
     }),
     NewsModule,
     AuthModule,
