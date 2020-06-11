@@ -12,7 +12,7 @@ export class Article {
   )
   user: User;
 
-  @Column({ unique: true })
+  @Column()
   url: string;
 
   constructor(id: number, url: string) {
