@@ -28,4 +28,8 @@ export class UsersService {
   checkHash(password: string, hash: string): Promise<boolean> {
     return compare(password, hash);
   }
+
+  findUserByUsername(username: string): Promise<User | undefined> {
+    return this.userRepository.findOne({ where: { username } });
+  }
 }
