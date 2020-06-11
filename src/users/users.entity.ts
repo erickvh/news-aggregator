@@ -1,10 +1,4 @@
-import {
-  PrimaryGeneratedColumn,
-  Column,
-  Entity,
-  OneToMany,
-  JoinTable,
-} from 'typeorm';
+import { PrimaryGeneratedColumn, Column, Entity, OneToMany } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Article } from './articles.entity';
 
