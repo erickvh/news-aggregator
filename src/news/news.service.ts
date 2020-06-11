@@ -11,6 +11,7 @@ import { NYTParse } from 'src/parsers/NYTParse';
 import { throwError, merge, Observable } from 'rxjs';
 import { AxiosError } from 'axios';
 import { NewParsed } from 'src/interfaces/NewParsed';
+import { NewsApiParse } from 'src/parsers/NewsApiParse';
 
 @Injectable()
 export class NewsService {
@@ -55,11 +56,31 @@ export class NewsService {
         }),
       );
   }
+
+  getNewsApiArticles(searchContent: string) {
+    const apiKey = this.configService.get('NEWS_API_KEY');
+
+    return this.httpService
+      .get(
+        `https://newsapi.org/v2/everything?q=${searchContent}&apiKey=${apiKey}`,
+      )
+      .pipe(
+        map(response => response.data.articles.map(NewsApiParse)),
+        catchError((err: AxiosError) => {
+          if (err.response) {
+            return throwError(
+              new HttpException(err.message, err.response.status),
+            );
+          }
+          return throwError(err);
+        }),
+      );
+  }
   getAggregatedNews(searchContent: string): Observable<NewParsed[]> {
     const guardianObservable = this.getGuardianArticles(searchContent);
     const nytObservable = this.getNYTimesArticles(searchContent);
-
-    return merge(guardianObservable, nytObservable).pipe(
+    const newsApiObservable = this.getNewsApiArticles(searchContent);
+    return merge(guardianObservable, nytObservable, newsApiObservable).pipe(
       reduce((newsAggregated, newsStream) => [
         ...newsAggregated,
         ...newsStream,
@@ -70,19 +91,19 @@ export class NewsService {
     );
   }
   getArticles(searchContent: string, source: string): Observable<NewParsed[]> {
-    if (source) {
-      switch (source) {
-        case 'nyt':
-          return this.getNYTimesArticles(searchContent);
-          break;
-        case 'guardian':
-          return this.getGuardianArticles(searchContent);
-          break;
-        default:
-          throw new BadRequestException('Provider not available');
-      }
-    }
+    if (!source) return this.getAggregatedNews(searchContent);
 
-    return this.getAggregatedNews(searchContent);
+    switch (source) {
+      case 'nyt':
+        return this.getNYTimesArticles(searchContent);
+        break;
+      case 'guardian':
+        return this.getGuardianArticles(searchContent);
+        break;
+      case 'newsapi':
+        return this.getNewsApiArticles(searchContent);
+      default:
+        throw new BadRequestException('Provider not available');
+    }
   }
 }
