@@ -10,7 +10,11 @@ export class ArticlesServices {
     private readonly articleRepository: Repository<Article>,
   ) {}
 
-  createArticle(url: string) {
-    return this.articleRepository.save({ url });
+  createArticle(url: string, userId: number) {
+    return this.articleRepository.save({ url, user: { id: userId } });
+  }
+
+  getUserArticles(id: number) {
+    return this.articleRepository.find({ where: { user: id } });
   }
 }
