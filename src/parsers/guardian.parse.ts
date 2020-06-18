@@ -1,5 +1,5 @@
-import { GuardianNew } from '../interfaces/guardian.interface';
-import { NewParsed } from '../interfaces/newparsed.interface';
+import { GuardianNew } from '../news/interfaces/guardian.interface';
+import { NewParsed } from '../news/interfaces/newparsed.interface';
 
 export function parseGuardian(article: GuardianNew): NewParsed {
   let author = 'Anonymous';
