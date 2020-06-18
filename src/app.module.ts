@@ -29,7 +29,7 @@ import { Article } from './users/articles.entity';
   ],
 })
 export class AppModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(EmptySearchMiddleware).forRoutes('news');
-  }
+  // configure(consumer: MiddlewareConsumer) {
+  //   consumer.apply(EmptySearchMiddleware).forRoutes('news');
+  // }
 }
