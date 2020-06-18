@@ -6,12 +6,12 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { map, catchError, reduce } from 'rxjs/operators';
-import { parseGuardian } from 'src/parsers/guardianParse';
-import { NYTParse } from 'src/parsers/NYTParse';
+import { parseGuardian } from 'src/parsers/guardian.parse';
+import { NYTParse } from 'src/parsers/nytapi.parse';
 import { throwError, merge, Observable } from 'rxjs';
 import { AxiosError } from 'axios';
-import { NewParsed } from 'src/interfaces/NewParsed';
-import { NewsApiParse } from 'src/parsers/NewsApiParse';
+import { NewParsed } from 'src/interfaces/newparsed.interface';
+import { NewsApiParse } from 'src/parsers/newsapi.parse';
 
 @Injectable()
 export class NewsService {
