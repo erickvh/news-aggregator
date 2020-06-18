@@ -10,6 +10,8 @@ import { UsersService } from 'src/users/users.service';
 import { LoginDTO } from './dto/login.dto';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
+import { User as UserDecorator } from 'src/user-decorator.decorator';
+import { User } from 'src/users/users.entity';
 
 @Controller('')
 export class AuthController {
@@ -28,7 +30,7 @@ export class AuthController {
   }
   @Post('login')
   @UseGuards(AuthGuard('local'))
-  login(@Body() loginDTO: LoginDTO) {
+  login(@UserDecorator() loginDTO: LoginDTO) {
     return this.authService.getToken(loginDTO);
   }
 }
