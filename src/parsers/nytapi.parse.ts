@@ -1,5 +1,5 @@
-import { NYTNew } from 'src/interfaces/NYTNew';
-import { NewParsed } from 'src/interfaces/NewParsed';
+import { NYTNew } from 'src/news/interfaces/nytapi.interface';
+import { NewParsed } from 'src/news/interfaces/newparsed.interface';
 
 export function NYTParse(article: NYTNew): NewParsed {
   return {

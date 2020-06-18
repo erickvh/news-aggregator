@@ -13,6 +13,6 @@ export class NewsController {
     @Query('q', EmptysearchPipe) textContent: string,
     @Query('source') source: string,
   ) {
-    return this.newsService.getArticles(textContent, source);
+    return this.newsService.RouteSourceStrategy(textContent, source);
   }
 }
