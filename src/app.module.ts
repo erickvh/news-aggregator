@@ -1,7 +1,6 @@
-import { Module, MiddlewareConsumer } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { NewsModule } from './news/news.module';
-import { EmptySearchMiddleware } from './middleware/empty-search.middleware';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -13,23 +12,23 @@ import { Article } from './users/articles.entity';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      port: parseInt(process.env.PORT_DB),
-      username: process.env.USER_DB,
-      password: process.env.PASSWORD_DB,
-      database: process.env.NAME_DB,
-      synchronize: true,
-      host: process.env.HOST_DB,
-      entities: [User, Article],
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        port: configService.get<number>('PORT_DB'),
+        username: configService.get('USER_DB'),
+        password: configService.get('PASSWORD_DB'),
+        database: configService.get('NAME_DB'),
+        host: configService.get('HOST_DB'),
+        synchronize: true,
+        entities: [User, Article],
+      }),
     }),
     NewsModule,
     AuthModule,
     UsersModule,
   ],
 })
-export class AppModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(EmptySearchMiddleware).forRoutes('news');
-  }
-}
+export class AppModule {}
