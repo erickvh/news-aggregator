@@ -7,11 +7,11 @@ import { Injectable, Scope } from '@nestjs/common';
 export class StrategyContext {
   private newStrategy: NewStrategy;
 
-  setArticleStrategy(newStrategy: NewStrategy): void {
+  setNewStrategy(newStrategy: NewStrategy): void {
     this.newStrategy = newStrategy;
   }
 
-  getStrategyArticles(textSearch: string): Observable<NewParsed[]> {
+  getNewStrategy(textSearch: string): Observable<NewParsed[]> {
     return this.newStrategy.getNews(textSearch);
   }
 }

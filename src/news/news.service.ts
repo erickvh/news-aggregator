@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { map, reduce } from 'rxjs/operators';
 import { merge, Observable } from 'rxjs';
 import { NewParsed } from 'src/news/interfaces/newparsed.interface';
@@ -28,15 +28,26 @@ export class NewsService {
   ): Observable<NewParsed[]> {
     if (!source)
       return this.mergeNews(searchContent, ...this.providerRouter.values());
+
+    if (!this.providerRouter.has(source)) {
+      const optionsAvailable = [...this.providerRouter.keys()].join(',');
+      throw new BadRequestException(
+        `Not a valid source, valid sources: ${optionsAvailable}`,
+      );
+    }
+
+    return this.getStrategyNews(searchContent, this.providerRouter.get(source));
   }
 
+  // get articles by context strategy
   getStrategyNews(
     searchContent: string,
     strategy: NewStrategy,
   ): Observable<NewParsed[]> {
-    this.strategyContext.setArticleStrategy(strategy);
-    return this.strategyContext.getStrategyArticles(searchContent);
+    this.strategyContext.setNewStrategy(strategy);
+    return this.strategyContext.getNewStrategy(searchContent);
   }
+
   mergeNews(
     searchContent: string,
     ...newsStrategies: NewStrategy[]
