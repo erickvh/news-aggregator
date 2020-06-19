@@ -1,4 +1,4 @@
-import { NewsApiNew } from '../interfaces/NewsApiNew';
+import { NewsApiNew } from '../news/interfaces/newsapi.interface';
 
 export function NewsApiParse(article: NewsApiNew) {
   const parsedArticle = {

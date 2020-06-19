@@ -1,6 +1,7 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { NewsService } from './news.service';
 import { AuthGuard } from '@nestjs/passport';
+import { EmptysearchPipe } from 'src/news/pipes/emptysearch.pipe';
 
 @Controller('news')
 export class NewsController {
@@ -9,9 +10,9 @@ export class NewsController {
   @Get()
   @UseGuards(AuthGuard('jwt'))
   searchArticles(
-    @Query('q') textContent: string,
+    @Query('q', EmptysearchPipe) textContent: string,
     @Query('source') source: string,
   ) {
-    return this.newsService.getArticles(textContent, source);
+    return this.newsService.RouteSourceStrategy(textContent, source);
   }
 }
